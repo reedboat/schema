@@ -2,7 +2,7 @@ from inspect import getargspec
 from functools import wraps
 
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 
 class SchemaError(Exception):
@@ -144,6 +144,12 @@ class Schema(object):
                 raise SchemaError('missed keys %r' % (required - coverage), e)
             if len(new) != len(data):
                 raise SchemaError('wrong keys %r in %r' % (new, data), e)
+
+            # deal with default if key missed
+            keys = ((skey.key(), skey.default()) for skey in s if type(skey) is Optional)
+            for key, value in keys:
+                if value is not None and not key in new:
+                    new[key] = value                
             return new
         if hasattr(s, 'validate'):
             try:
@@ -178,3 +184,17 @@ class Schema(object):
 class Optional(Schema):
 
     """Marker for an optional part of Schema."""
+
+    """optional part of schema, but return default value if key not exists"""
+
+    def __init__(self, schema=None, default=None):
+       self.default_value  = default
+       super(self.__class__, self).__init__(schema)
+
+    def default(self):
+        return self.default_value
+
+    def key(self):
+        return self._schema
+
+    
