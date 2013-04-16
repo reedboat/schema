@@ -1,12 +1,11 @@
-
 import re
 from functools import wraps
 
-def ValidIdentifier(msg = None):
+def Identifier(msg = None):
     ''' Value Must be a valid identifier 
       started with underline or letter
       only numbers, underline or letter included'''
-    @wraps(ValidIdentifier)
+    @wraps(Identifier)
     def f(v):
         pattern = re.compile('^[a-z_]\w*$')
         if not pattern.match(v):
@@ -24,9 +23,9 @@ def List(validator, seperator, msg = None):
         return items
     return f
 
-def ValidDict(msg = None):
+def Dict(msg = None):
     '''Value Must be JSON Dict'''
-    @wraps(ValidDict)
+    @wraps(Dict)
     def f(v):
         if v[0] != '{' or v[-1] != '}':
             raise ValueError(msg or 'invalid Json Dict')
